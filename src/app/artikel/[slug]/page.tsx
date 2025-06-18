@@ -4,14 +4,12 @@ import { createClient } from '@/lib/supabase';
 
 export const revalidate = 60;
 
-// ✅ Define the correct type for props
-interface PageProps {
-  params: {
-    slug: string;
-  };
-}
-
-export default async function ArtikelDetailPage({ params }: PageProps) {
+// ✅ Gunakan inline type untuk menghindari konflik saat build
+export default async function ArtikelDetailPage({
+  params,
+}: {
+  params: { slug: string };
+}) {
   const supabase = createClient();
 
   const { data: article, error } = await supabase
