@@ -1,30 +1,37 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase';
 
+interface Video {
+  id: string;
+  title: string;
+  url: string;
+  deskripsi: string;
+}
+
 export default function AdminVideoPage() {
   const supabase = createClient();
-  const [videos, setVideos] = useState<any[]>([]);
+  const [videos, setVideos] = useState<Video[]>([]);
   const [title, setTitle] = useState('');
   const [url, setUrl] = useState('');
   const [deskripsi, setDeskripsi] = useState('');
   const [loading, setLoading] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
 
-  const fetchVideos = async () => {
+  const fetchVideos = useCallback(async () => {
     const { data, error } = await supabase
       .from('videos')
       .select('*')
       .order('id', { ascending: false });
+
     if (error) {
       console.error('Error fetching videos:', error);
-    } else {
-      setVideos(data);
+    } else if (data) {
+      setVideos(data as Video[]);
     }
-  };
+  }, [supabase]);
 
-  // Convert URL biasa ke format embed
   const convertToEmbedUrl = (youtubeUrl: string): string => {
     const match = youtubeUrl.match(/(?:v=|\/embed\/|\.be\/)([a-zA-Z0-9_-]{11})/);
     return match ? `https://www.youtube.com/embed/${match[1]}` : youtubeUrl;
@@ -40,11 +47,11 @@ export default function AdminVideoPage() {
     const embedUrl = convertToEmbedUrl(url);
 
     if (editingId) {
-      // Update mode
       const { error } = await supabase
         .from('videos')
         .update({ title, url: embedUrl, deskripsi })
         .eq('id', editingId);
+
       if (error) {
         alert('Gagal mengedit video.');
         console.error(error);
@@ -53,14 +60,10 @@ export default function AdminVideoPage() {
         fetchVideos();
       }
     } else {
-      // Tambah baru
       const { error } = await supabase.from('videos').insert([
-        {
-          title,
-          url: embedUrl,
-          deskripsi,
-        },
+        { title, url: embedUrl, deskripsi },
       ]);
+
       if (error) {
         alert('Gagal menambahkan video.');
         console.error(error);
@@ -83,7 +86,7 @@ export default function AdminVideoPage() {
     }
   };
 
-  const editVideo = (video: any) => {
+  const editVideo = (video: Video) => {
     setEditingId(video.id);
     setTitle(video.title);
     setDeskripsi(video.deskripsi);
@@ -99,7 +102,7 @@ export default function AdminVideoPage() {
 
   useEffect(() => {
     fetchVideos();
-  }, []);
+  }, [fetchVideos]);
 
   return (
     <main className="p-6 max-w-3xl mx-auto">

@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase';
+import Image from 'next/image';
 
 export default function AdminLoginPage() {
   const [email, setEmail] = useState('');
@@ -15,7 +16,7 @@ export default function AdminLoginPage() {
     e.preventDefault();
     setErrorMsg('');
 
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
@@ -32,10 +33,12 @@ export default function AdminLoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
       <form onSubmit={handleLogin} className="bg-white p-8 rounded shadow-md w-full max-w-md text-center">
         {/* Logo BNN */}
-        <img
-          src="images/logo bnn.png"
+       <Image
+          src="/images/logo bnn.png"
           alt="Logo BNN"
-          className="mx-auto mb-6 w-40 h-40 object-contain"
+          width={160}
+          height={160}
+          className="mx-auto mb-6 object-contain"
         />
 
         <h2 className="text-2xl font-bold mb-6">Login Admin</h2>

@@ -301,7 +301,6 @@ export default function KuisPage() {
 
           <div className="space-y-4">
             {soal.map((s, i) => {
-              const benar = s.benar === jawabanUser[i];
               return (
                 <div key={i} className="p-4 border rounded">
                   <p className="font-semibold">

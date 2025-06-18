@@ -17,7 +17,7 @@ function generateSlug(text: string) {
     .toLowerCase()
     .trim()
     .replace(/[^a-z0-9]+/g, '-') // ganti spasi & karakter non-alfanumerik jadi '-'
-    .replace(/^-+|-+$/g, ''); // hapus strip di awal & akhir
+    .replace(/^-+|-+$/g, '');    // hapus strip di awal & akhir
 }
 
 export default function AdminArtikelPage() {
@@ -47,12 +47,11 @@ export default function AdminArtikelPage() {
       alert('Judul dan konten artikel harus diisi!');
       return;
     }
-    setLoading(true);
 
+    setLoading(true);
     const slug = generateSlug(title);
 
     if (editingId) {
-      // Update artikel
       const { error } = await supabase
         .from('articles')
         .update({ title, content, slug })
@@ -66,7 +65,6 @@ export default function AdminArtikelPage() {
         fetchArticles();
       }
     } else {
-      // Insert artikel baru
       const { error } = await supabase
         .from('articles')
         .insert([{ title, content, slug }]);
