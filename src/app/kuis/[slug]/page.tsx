@@ -181,7 +181,7 @@ export default function KuisPage() {
     if (soal.length) {
       setJawabanUser(Array(soal.length).fill(null));
     }
-  }, [slug]);
+  }, [soal.length]);
 
   const handleJawaban = (i: number) => {
     const updated = [...jawabanUser];
