@@ -84,11 +84,6 @@ export default function Home() {
           <p className="text-lg md:text-xl mb-6 max-w-2xl drop-shadow-lg">
             Edukasi, pencegahan, dan pemberdayaan masyarakat terhadap bahaya narkoba.
           </p>
-          <Link href="/artikel">
-            <span className="inline-block bg-white text-blue-800 px-6 py-3 rounded-full font-semibold hover:bg-gray-100 transition">
-              Jelajahi
-            </span>
-          </Link>
         </div>
       </section>
 
