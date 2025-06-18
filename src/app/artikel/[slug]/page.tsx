@@ -2,13 +2,13 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase';
 
+interface Props {
+  params: { slug: string };
+}
+
 export const revalidate = 60;
 
-export default async function ArtikelDetailPage({
-  params,
-}: {
-  params: { slug: string };
-}) {
+export default async function ArtikelDetailPage({ params }: Props) {
   const supabase = createClient();
 
   const { data: article, error } = await supabase
