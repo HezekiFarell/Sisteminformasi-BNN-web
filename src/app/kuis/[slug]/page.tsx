@@ -1,9 +1,9 @@
 "use client";
 import { useParams, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const soalByKategori: Record<string, { pertanyaan: string; jawaban: string[]; benar: number }[]> = {
-  "pengetahuan-umum": [
+    "pengetahuan-umum": [
     {
       pertanyaan: "Apa itu narkotika?",
       jawaban: ["Zat makanan", "Obat untuk hewan", "Zat yang dapat mempengaruhi fungsi otak", "obat terlarang"],
@@ -160,7 +160,6 @@ const soalByKategori: Record<string, { pertanyaan: string; jawaban: string[]; be
     },
   ],
 };// (Gunakan data soal kamu sebelumnya di sini)
-
 const kategoriNama: Record<string, string> = {
   "pengetahuan-umum": "Pengetahuan Umum Narkotika",
   "pencegahan": "Pencegahan",
@@ -170,11 +169,19 @@ const kategoriNama: Record<string, string> = {
 export default function KuisPage() {
   const { slug } = useParams();
   const router = useRouter();
-  const soal = soalByKategori[slug as string] || [];
+
+  const soal = slug ? soalByKategori[slug as string] || [] : [];
 
   const [index, setIndex] = useState(0);
-  const [jawabanUser, setJawabanUser] = useState<(number | null)[]>(Array(soal.length).fill(null));
+  const [jawabanUser, setJawabanUser] = useState<(number | null)[]>([]);
   const [selesai, setSelesai] = useState(false);
+
+  // Set jawaban kosong sesuai jumlah soal
+  useEffect(() => {
+    if (soal.length) {
+      setJawabanUser(Array(soal.length).fill(null));
+    }
+  }, [slug]);
 
   const handleJawaban = (i: number) => {
     const updated = [...jawabanUser];
@@ -200,8 +207,9 @@ export default function KuisPage() {
     setJawabanUser(Array(soal.length).fill(null));
     setSelesai(false);
   };
- const skor: number = jawabanUser.reduce((acc: number, j, i) => {
-  return j === soal[i].benar ? acc + 1 : acc;
+
+  const skor: number = jawabanUser.reduce((acc: number, j, i) => {
+  return soal[i]?.benar === j ? acc + 1 : acc;
 }, 0);
 
   if (!soal.length) {
@@ -214,6 +222,8 @@ export default function KuisPage() {
       </main>
     );
   }
+
+  const currentSoal = soal[index];
 
   return (
     <div className="min-h-screen bg-white p-6 text-gray-800 max-w-2xl mx-auto">
@@ -230,7 +240,7 @@ export default function KuisPage() {
         </button>
       </div>
 
-      {!selesai ? (
+      {!selesai && currentSoal ? (
         <>
           <div className="mb-4">
             <div className="flex justify-between items-center mb-2">
@@ -252,17 +262,16 @@ export default function KuisPage() {
           </div>
 
           <div className="bg-white shadow-md p-6 rounded-xl border">
-            <h2 className="text-lg font-bold mb-4 text-gray-800">{soal[index].pertanyaan}</h2>
+            <h2 className="text-lg font-bold mb-4 text-gray-800">{currentSoal.pertanyaan}</h2>
             <div className="grid gap-3">
-              {soal[index].jawaban.map((j, i) => {
+              {currentSoal.jawaban.map((j, i) => {
                 const isSelected = jawabanUser[index] === i;
                 return (
                   <button
                     key={i}
                     onClick={() => handleJawaban(i)}
                     className={`p-3 rounded-lg font-medium text-left shadow-sm transition-all duration-200
-                      ${isSelected ? "bg-green-500 text-white" : "bg-blue-100 hover:bg-blue-200 text-blue-900"}
-                    `}
+                      ${isSelected ? "bg-green-500 text-white" : "bg-blue-100 hover:bg-blue-200 text-blue-900"}`}
                   >
                     {j}
                   </button>
@@ -300,32 +309,27 @@ export default function KuisPage() {
           </p>
 
           <div className="space-y-4">
-            {soal.map((s, i) => {
-              return (
-                <div key={i} className="p-4 border rounded">
-                  <p className="font-semibold">
-                    {i + 1}. {s.pertanyaan}
-                  </p>
-                  <ul className="mt-2 space-y-1">
-                    {s.jawaban.map((opt, j) => {
-                      const isUser = j === jawabanUser[i];
-                      const isRight = j === s.benar;
-                      let cls = "px-3 py-1 rounded";
-                      if (isRight) cls += " bg-green-200";
-                      else if (isUser) cls += " bg-red-200";
-                      else cls += " bg-gray-100";
-
-                      return (
-                        <li key={j} className={cls}>
-                          {opt} {isUser && !isRight && "(Jawabanmu)"}
-                          {isUser && isRight && " ✅"}
-                        </li>
-                      );
-                    })}
-                  </ul>
-                </div>
-              );
-            })}
+            {soal.map((s, i) => (
+              <div key={i} className="p-4 border rounded">
+                <p className="font-semibold">{i + 1}. {s.pertanyaan}</p>
+                <ul className="mt-2 space-y-1">
+                  {s.jawaban.map((opt, j) => {
+                    const isUser = j === jawabanUser[i];
+                    const isRight = j === s.benar;
+                    let cls = "px-3 py-1 rounded";
+                    if (isRight) cls += " bg-green-200";
+                    else if (isUser) cls += " bg-red-200";
+                    else cls += " bg-gray-100";
+                    return (
+                      <li key={j} className={cls}>
+                        {opt} {isUser && !isRight && "(Jawabanmu)"}
+                        {isUser && isRight && " ✅"}
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            ))}
           </div>
 
           <div className="mt-8 flex flex-col items-center gap-4">
