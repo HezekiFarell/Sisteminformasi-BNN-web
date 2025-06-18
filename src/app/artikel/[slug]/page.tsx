@@ -4,11 +4,11 @@ import { createClient } from '@/lib/supabase';
 
 export const revalidate = 60;
 
-type PageProps = {
+export default async function ArtikelDetailPage({
+  params,
+}: {
   params: { slug: string };
-};
-
-export default async function ArtikelDetailPage({ params }: PageProps) {
+}) {
   const supabase = createClient();
 
   const { data: article, error } = await supabase
