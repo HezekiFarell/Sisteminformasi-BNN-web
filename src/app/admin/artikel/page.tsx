@@ -1,6 +1,5 @@
 'use client';
-import { useEffect, useState, useCallback } from 'react'; // ✅ useCallback ditambahkan
-import Link from 'next/link';
+import { useEffect, useState, useCallback } from 'react';
 import { createClient } from '@/lib/supabase';
 
 interface Article {
@@ -39,7 +38,7 @@ export default function AdminArtikelPage() {
     } else {
       setArticles(data || []);
     }
-  }, [supabase]); // ✅ tambahkan dependency jika perlu
+  }, [supabase]);
 
   const addOrUpdateArticle = async () => {
     if (!title || !content) {
@@ -104,12 +103,73 @@ export default function AdminArtikelPage() {
 
   useEffect(() => {
     fetchArticles();
-  }, [fetchArticles]); // ✅ warning teratasi
+  }, [fetchArticles]);
 
   return (
-    // ... (bagian UI tidak berubah)
     <main className="p-6 max-w-4xl mx-auto">
-      {/* ... semua UI seperti sebelumnya */}
+      <h1 className="text-2xl font-bold mb-4">Manajemen Artikel</h1>
+
+      <div className="mb-6">
+        <input
+          type="text"
+          placeholder="Judul artikel"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          className="w-full p-2 border rounded mb-2"
+        />
+        <textarea
+          placeholder="Konten artikel"
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+          className="w-full p-2 border rounded mb-2"
+          rows={5}
+        />
+        <button
+          onClick={addOrUpdateArticle}
+          disabled={loading}
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
+        >
+          {editingId ? 'Update Artikel' : 'Tambah Artikel'}
+        </button>
+        {editingId && (
+          <button
+            onClick={resetForm}
+            className="ml-2 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+          >
+            Batal
+          </button>
+        )}
+      </div>
+
+      <hr className="my-6" />
+
+      <h2 className="text-xl font-semibold mb-2">Daftar Artikel</h2>
+      {articles.length === 0 ? (
+        <p className="text-gray-500">Belum ada artikel.</p>
+      ) : (
+        <ul className="space-y-4">
+          {articles.map((article) => (
+            <li key={article.id} className="border p-4 rounded shadow-sm">
+              <h3 className="font-bold text-lg">{article.title}</h3>
+              <p className="text-gray-700">{article.content}</p>
+              <div className="mt-2 flex gap-2">
+                <button
+                  onClick={() => editArticle(article)}
+                  className="text-blue-600 hover:underline"
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={() => deleteArticle(article.id)}
+                  className="text-red-600 hover:underline"
+                >
+                  Hapus
+                </button>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
     </main>
   );
 }
